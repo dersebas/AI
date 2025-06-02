@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Waschbär-Spiel</title>
     <style>
         body {
@@ -15,6 +15,10 @@
             height: 100vh;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         #game-container {
             position: relative;
@@ -23,6 +27,7 @@
             background-color: #4CAF50;
             overflow: hidden;
             border-radius: 10px;
+            touch-action: none;
         }
         #raccoon {
             position: absolute;
@@ -63,24 +68,21 @@
     </div>
     <div id="score">Äpfel: <span id="score-value">0</span></div>
     <div id="controls">
-        <button id="up">Nach oben</button>
-        <button id="down">Nach unten</button>
-        <button id="left">Nach links</button>
-        <button id="right">Nach rechts</button>
+        <button id="up" onmousedown="startMoving('up')" ontouchstart="startMoving('up')" onmouseup="stopMoving()" ontouchend="stopMoving()">Nach oben</button>
+        <button id="down" onmousedown="startMoving('down')" ontouchstart="startMoving('down')" onmouseup="stopMoving()" ontouchend="stopMoving()">Nach unten</button>
+        <button id="left" onmousedown="startMoving('left')" ontouchstart="startMoving('left')" onmouseup="stopMoving()" ontouchend="stopMoving()">Nach links</button>
+        <button id="right" onmousedown="startMoving('right')" ontouchstart="startMoving('right')" onmouseup="stopMoving()" ontouchend="stopMoving()">Nach rechts</button>
     </div>
 
     <script>
         const raccoon = document.getElementById('raccoon');
         const gameContainer = document.getElementById('game-container');
-        const upButton = document.getElementById('up');
-        const downButton = document.getElementById('down');
-        const leftButton = document.getElementById('left');
-        const rightButton = document.getElementById('right');
         const scoreValue = document.getElementById('score-value');
 
         let positionX = 125;
         let positionY = 125;
         let score = 0;
+        let moveInterval;
 
         function updatePosition() {
             raccoon.style.left = positionX + 'px';
@@ -118,65 +120,8 @@
 
         setInterval(createApple, 2000);
 
-        upButton.addEventListener('click', () => {
-            if (positionY > 0) {
-                positionY -= 10;
-                updatePosition();
-            }
-        });
-
-        downButton.addEventListener('click', () => {
-            if (positionY < 250) {
-                positionY += 10;
-                updatePosition();
-            }
-        });
-
-        leftButton.addEventListener('click', () => {
-            if (positionX > 0) {
-                positionX -= 10;
-                updatePosition();
-            }
-        });
-
-        rightButton.addEventListener('click', () => {
-            if (positionX < 250) {
-                positionX += 10;
-                updatePosition();
-            }
-        });
-
-        // Touch-Events für mobile Geräte
-        gameContainer.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touchX = e.touches[0].clientX - gameContainer.getBoundingClientRect().left;
-            const touchY = e.touches[0].clientY - gameContainer.getBoundingClientRect().top;
-
-            if (touchX < positionX) {
-                if (positionX > 0) {
-                    positionX -= 10;
-                    updatePosition();
-                }
-            } else if (touchX > positionX) {
-                if (positionX < 250) {
-                    positionX += 10;
-                    updatePosition();
-                }
-            }
-
-            if (touchY < positionY) {
-                if (positionY > 0) {
-                    positionY -= 10;
-                    updatePosition();
-                }
-            } else if (touchY > positionY) {
-                if (positionY < 250) {
-                    positionY += 10;
-                    updatePosition();
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+        function startMoving(direction) {
+            if (moveInterval) clearInterval(moveInterval);
+            moveInterval = setInterval(() => {
+  
 
