@@ -3,149 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waschbär Spiel</title>
+    <title>Waschbär-Spiel</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #e0f7fa;
             margin: 0;
-        }
-        #gameCanvas {
-            border: 2px solid #000;
-            background-color: #fff;
-        }
-        .controls {
+            padding: 0;
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
-        .button {
+        #game-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
             background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 15px;
-            margin: 5px;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        #raccoon {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #555;
+            border-radius: 50%;
+            top: 125px;
+            left: 125px;
+        }
+        #controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 20px;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="600"></canvas>
-    <div class="controls">
-        <button class="button" id="leftBtn">Links</button>
-        <button class="button" id="rightBtn">Rechts</button>
+    <div id="game-container">
+        <div id="raccoon"></div>
     </div>
+    <div id="controls">
+        <button id="up">Nach oben</button>
+        <button id="down">Nach unten</button>
+        <button id="left">Nach links</button>
+        <button id="right">Nach rechts</button>
+    </div>
+
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        const raccoon = document.getElementById('raccoon');
+        const gameContainer = document.getElementById('game-container');
+        const upButton = document.getElementById('up');
+        const downButton = document.getElementById('down');
+        const leftButton = document.getElementById('left');
+        const rightButton = document.getElementById('right');
 
-        const raccoonEmoji = '🦝'; // Waschbär Emoji
-        const appleEmoji = '🍏'; // Apfel Emoji
+        let positionX = 125;
+        let positionY = 125;
 
-        let raccoon = { x: 180, y: 500, width: 40, height: 40 };
-        let apples = [];
-        let score = 0;
-        let gameOver = false;
-        let moveDirection = null;
-        let moveInterval;
-
-        function drawRaccoon() {
-            ctx.font = '40px Arial';
-            ctx.fillText(raccoonEmoji, raccoon.x, raccoon.y + 30); // +30 für die Höhe des Emojis
+        function updatePosition() {
+            raccoon.style.left = positionX + 'px';
+            raccoon.style.top = positionY + 'px';
         }
 
-        function drawApples() {
-            ctx.font = '30px Arial';
-            apples.forEach(apple => {
-                ctx.fillText(appleEmoji, apple.x, apple.y + 25); // +25 für die Höhe des Emojis
-            });
-        }
-
-        function updateApples() {
-            if (Math.random() < 0.01) { // Weniger Äpfel erscheinen
-                apples.push({ x: Math.random() * canvas.width, y: 0 });
+        upButton.addEventListener('click', () => {
+            if (positionY > 0) {
+                positionY -= 10;
+                updatePosition();
             }
-            apples.forEach(apple => {
-                apple.y += 2;
-                if (apple.y > canvas.height) {
-                    gameOver = true;
+        });
+
+        downButton.addEventListener('click', () => {
+            if (positionY < 250) {
+                positionY += 10;
+                updatePosition();
+            }
+        });
+
+        leftButton.addEventListener('click', () => {
+            if (positionX > 0) {
+                positionX -= 10;
+                updatePosition();
+            }
+        });
+
+        rightButton.addEventListener('click', () => {
+            if (positionX < 250) {
+                positionX += 10;
+                updatePosition();
+            }
+        });
+
+        // Touch-Events für mobile Geräte
+        gameContainer.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touchX = e.touches[0].clientX - gameContainer.getBoundingClientRect().left;
+            const touchY = e.touches[0].clientY - gameContainer.getBoundingClientRect().top;
+
+            if (touchX < positionX) {
+                if (positionX > 0) {
+                    positionX -= 10;
+                    updatePosition();
                 }
-                if (apple.x < raccoon.x + raccoon.width && apple.x + 30 > raccoon.x && apple.y < raccoon.y + raccoon.height && apple.y + 30 > raccoon.y) {
-                    score++;
-                    apples.splice(apples.indexOf(apple), 1);
+            } else if (touchX > positionX) {
+                if (positionX < 250) {
+                    positionX += 10;
+                    updatePosition();
                 }
-            });
-        }
-
-        function drawScore() {
-            ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
-            ctx.fillText('Punkte: ' + score, 10, 20);
-        }
-
-        function gameLoop() {
-            if (gameOver) {
-                ctx.fillStyle = 'black';
-                ctx.font = '40px Arial';
-                ctx.fillText('Spiel Vorbei!', 100, canvas.height / 2);
-                return;
             }
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawRaccoon();
-            drawApples();
-            drawScore();
-            updateApples();
-            requestAnimationFrame(gameLoop);
-        }
 
-        function moveRaccoon() {
-            if (moveDirection === 'left' && raccoon.x > 0) {
-                raccoon.x -= 5; // Geschwindigkeit der Bewegung
-            } else if (moveDirection === 'right' && raccoon.x < canvas.width - raccoon.width) {
-                raccoon.x += 5; // Geschwindigkeit der Bewegung
+            if (touchY < positionY) {
+                if (positionY > 0) {
+                    positionY -= 10;
+                    updatePosition();
+                }
+            } else if (touchY > positionY) {
+                if (positionY < 250) {
+                    positionY += 10;
+                    updatePosition();
+                }
             }
-        }
-
-        document.getElementById('leftBtn').addEventListener('mousedown', () => {
-            moveDirection = 'left';
-            moveRaccoon();
-            moveInterval = setInterval(moveRaccoon, 100); // Kontinuierliche Bewegung
         });
-
-        document.getElementById('rightBtn').addEventListener('mousedown', () => {
-            moveDirection = 'right';
-            moveRaccoon();
-            moveInterval = setInterval(moveRaccoon, 
-
-            moveInterval = setInterval(moveRaccoon, 100); // Kontinuierliche Bewegung
-        });
-
-        document.getElementById('leftBtn').addEventListener('mouseup', () => {
-            moveDirection = null;
-            clearInterval(moveInterval); // Stoppe die Bewegung
-        });
-
-        document.getElementById('rightBtn').addEventListener('mouseup', () => {
-            moveDirection = null;
-            clearInterval(moveInterval); // Stoppe die Bewegung
-        });
-
-        document.getElementById('leftBtn').addEventListener('mouseleave', () => {
-            moveDirection = null;
-            clearInterval(moveInterval); // Stoppe die Bewegung, wenn die Maus den Button verlässt
-        });
-
-        document.getElementById('rightBtn').addEventListener('mouseleave', () => {
-            moveDirection = null;
-            clearInterval(moveInterval); // Stoppe die Bewegung, wenn die Maus den Button verlässt
-        });
-
-        gameLoop(); // Starte das Spiel
     </script>
 </body>
 </html>
