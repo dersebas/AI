@@ -7,8 +7,9 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             background-color: #e0f7fa;
             margin: 0;
@@ -17,13 +18,34 @@
             border: 2px solid #000;
             background-color: #fff;
         }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div class="controls">
+        <button class="button" id="leftBtn">Links</button>
+        <button class="button" id="rightBtn">Rechts</button>
+    </div>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        const raccoonEmoji = '🦝'; // Waschbär Emoji
+        const appleEmoji = '🍏'; // Apfel Emoji
 
         let raccoon = { x: 180, y: 500, width: 40, height: 40 };
         let apples = [];
@@ -31,16 +53,14 @@
         let gameOver = false;
 
         function drawRaccoon() {
-            ctx.fillStyle = 'gray';
-            ctx.fillRect(raccoon.x, raccoon.y, raccoon.width, raccoon.height);
+            ctx.font = '40px Arial';
+            ctx.fillText(raccoonEmoji, raccoon.x, raccoon.y + 30); // +30 für die Höhe des Emojis
         }
 
         function drawApples() {
-            ctx.fillStyle = 'red';
+            ctx.font = '30px Arial';
             apples.forEach(apple => {
-                ctx.beginPath();
-                ctx.arc(apple.x, apple.y, 15, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillText(appleEmoji, apple.x, apple.y + 25); // +25 für die Höhe des Emojis
             });
         }
 
@@ -53,7 +73,7 @@
                 if (apple.y > canvas.height) {
                     gameOver = true;
                 }
-                if (apple.x < raccoon.x + raccoon.width && apple.x + 15 > raccoon.x && apple.y < raccoon.y + raccoon.height && apple.y + 15 > raccoon.y) {
+                if (apple.x < raccoon.x + raccoon.width && apple.x + 30 > raccoon.x && apple.y < raccoon.y + raccoon.height && apple.y + 30 > raccoon.y) {
                     score++;
                     apples.splice(apples.indexOf(apple), 1);
                 }
@@ -81,15 +101,19 @@
             requestAnimationFrame(gameLoop);
         }
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft' && raccoon.x > 0) {
+        function moveRaccoon(direction) {
+            if (direction === 'left' && raccoon.x > 0) {
                 raccoon.x -= 20;
-            } else if (event.key === 'ArrowRight' && raccoon.x < canvas.width - raccoon.width) {
+            } else if (direction === 'right' && raccoon.x < canvas.width - raccoon.width) {
                 raccoon.x += 20;
             }
-        });
+        }
+
+        document.getElementById('leftBtn').addEventListener('click', () => moveRaccoon('left'));
+        document.getElementById('rightBtn').addEventListener('click', () => moveRaccoon('right'));
 
         gameLoop();
     </script>
 </body>
 </html>
+
