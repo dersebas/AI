@@ -120,8 +120,32 @@
         document.getElementById('rightBtn').addEventListener('mousedown', () => {
             moveDirection = 'right';
             moveRaccoon();
-            moveInterval = setInterval(moveRaccoon, 100); //
-      gameLoop();
+            moveInterval = setInterval(moveRaccoon, 
+
+            moveInterval = setInterval(moveRaccoon, 100); // Kontinuierliche Bewegung
+        });
+
+        document.getElementById('leftBtn').addEventListener('mouseup', () => {
+            moveDirection = null;
+            clearInterval(moveInterval); // Stoppe die Bewegung
+        });
+
+        document.getElementById('rightBtn').addEventListener('mouseup', () => {
+            moveDirection = null;
+            clearInterval(moveInterval); // Stoppe die Bewegung
+        });
+
+        document.getElementById('leftBtn').addEventListener('mouseleave', () => {
+            moveDirection = null;
+            clearInterval(moveInterval); // Stoppe die Bewegung, wenn die Maus den Button verlässt
+        });
+
+        document.getElementById('rightBtn').addEventListener('mouseleave', () => {
+            moveDirection = null;
+            clearInterval(moveInterval); // Stoppe die Bewegung, wenn die Maus den Button verlässt
+        });
+
+        gameLoop(); // Starte das Spiel
     </script>
 </body>
 </html>
