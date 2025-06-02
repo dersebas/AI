@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -31,6 +32,18 @@
             border-radius: 50%;
             top: 125px;
             left: 125px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+        .apple {
+            position: absolute;
+            font-size: 24px;
+        }
+        #score {
+            margin-top: 20px;
+            font-size: 20px;
         }
         #controls {
             margin-top: 20px;
@@ -46,8 +59,9 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="raccoon"></div>
+        <div id="raccoon">🦝</div>
     </div>
+    <div id="score">Äpfel: <span id="score-value">0</span></div>
     <div id="controls">
         <button id="up">Nach oben</button>
         <button id="down">Nach unten</button>
@@ -62,14 +76,47 @@
         const downButton = document.getElementById('down');
         const leftButton = document.getElementById('left');
         const rightButton = document.getElementById('right');
+        const scoreValue = document.getElementById('score-value');
 
         let positionX = 125;
         let positionY = 125;
+        let score = 0;
 
         function updatePosition() {
             raccoon.style.left = positionX + 'px';
             raccoon.style.top = positionY + 'px';
+            checkCollision();
         }
+
+        function checkCollision() {
+            const apples = document.querySelectorAll('.apple');
+            apples.forEach(apple => {
+                const appleRect = apple.getBoundingClientRect();
+                const raccoonRect = raccoon.getBoundingClientRect();
+
+                if (
+                    appleRect.left < raccoonRect.right &&
+                    appleRect.right > raccoonRect.left &&
+                    appleRect.top < raccoonRect.bottom &&
+                    appleRect.bottom > raccoonRect.top
+                ) {
+                    apple.remove();
+                    score++;
+                    scoreValue.textContent = score;
+                }
+            });
+        }
+
+        function createApple() {
+            const apple = document.createElement('div');
+            apple.className = 'apple';
+            apple.innerHTML = '🍎';
+            apple.style.left = Math.floor(Math.random() * 280) + 'px';
+            apple.style.top = Math.floor(Math.random() * 280) + 'px';
+            gameContainer.appendChild(apple);
+        }
+
+        setInterval(createApple, 2000);
 
         upButton.addEventListener('click', () => {
             if (positionY > 0) {
