@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -51,6 +51,8 @@
         let apples = [];
         let score = 0;
         let gameOver = false;
+        let moveDirection = null;
+        let moveInterval;
 
         function drawRaccoon() {
             ctx.font = '40px Arial';
@@ -65,7 +67,7 @@
         }
 
         function updateApples() {
-            if (Math.random() < 0.02) {
+            if (Math.random() < 0.01) { // Weniger Äpfel erscheinen
                 apples.push({ x: Math.random() * canvas.width, y: 0 });
             }
             apples.forEach(apple => {
@@ -101,18 +103,25 @@
             requestAnimationFrame(gameLoop);
         }
 
-        function moveRaccoon(direction) {
-            if (direction === 'left' && raccoon.x > 0) {
-                raccoon.x -= 20;
-            } else if (direction === 'right' && raccoon.x < canvas.width - raccoon.width) {
-                raccoon.x += 20;
+        function moveRaccoon() {
+            if (moveDirection === 'left' && raccoon.x > 0) {
+                raccoon.x -= 5; // Geschwindigkeit der Bewegung
+            } else if (moveDirection === 'right' && raccoon.x < canvas.width - raccoon.width) {
+                raccoon.x += 5; // Geschwindigkeit der Bewegung
             }
         }
 
-        document.getElementById('leftBtn').addEventListener('click', () => moveRaccoon('left'));
-        document.getElementById('rightBtn').addEventListener('click', () => moveRaccoon('right'));
+        document.getElementById('leftBtn').addEventListener('mousedown', () => {
+            moveDirection = 'left';
+            moveRaccoon();
+            moveInterval = setInterval(moveRaccoon, 100); // Kontinuierliche Bewegung
+        });
 
-        gameLoop();
+        document.getElementById('rightBtn').addEventListener('mousedown', () => {
+            moveDirection = 'right';
+            moveRaccoon();
+            moveInterval = setInterval(moveRaccoon, 100); //
+      gameLoop();
     </script>
 </body>
 </html>
